@@ -8,6 +8,9 @@ return {
   enabled = Is_Enabled(plugin),
   opts = function(_, opts)
     opts.merge_keywords = true
-    opts.keywords = Constants.icons.keywords
+    -- opts.keywords = Constants.icons.keywords
+    opts.keywords = {
+      TBD = { icon = " ", color = "warning" },
+    }
   end
 }

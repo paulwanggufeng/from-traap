@@ -34,8 +34,11 @@ Keymap("n", "Vaa", "ggVG")
 Keymap("n", "<leader>V", "V`]")
 
 -- Save all files.
-Keymap("n", "<F2>", "<cmd>wall<cr>")
+Keymap({ "n", "i", "v", "x" }, "<C-s>", "<cmd>wall<cr>")
 
+-- Delete to end of word
+Keymap("n", "<C-Del>", "de")
+Keymap("i", "<C-Del>", "<Esc>ldei")
 
 -- Toggle [in]visible characters.
 Keymap("n", "<leader>i", "<cmd>set list!<cr>")
@@ -43,9 +46,21 @@ Keymap("n", "<leader>i", "<cmd>set list!<cr>")
 -- Stay in indent mode.
 Keymap("v", "<", "<gv")
 Keymap("v", ">", ">gv")
+--
+-- 单行或多行移动
+Keymap("v", "J", ":m '>+1<CR>gv=gv")
+Keymap("v", "K", ":m '<-2<CR>gv=gv")
+
+-- 取消高亮
+Keymap("n", "<leader>nl", ":nohl<CR>")
+
+-- 注释当前单词,可用于快速注释 'Unused parameter'
+-- 'CommentUnusedparameter'
+Keymap("n", "<leader>cu", "ciw/*<Esc>pa*/<Esc>")
 
 -- Visual yank
 Keymap("v", "<leader>cc", '"+y')
+Keymap("v", "<C-c>", '"*y')
 
 -- Obfuscate
 Keymap("n", "<f3>", "mmggg?G`m")
@@ -53,8 +68,17 @@ Keymap("n", "<f3>", "mmggg?G`m")
 -- <leader>x conflicts with LazyVim
 Keymap("n", "<leader>X", "<Plug>(bullets-toggle-checkbox)")
 
+-- quickfix 窗口总是显示在最下面
+-- wincmd foo is equivalent with typing ^W foo, and CTRL-W_J moves the current window to the very bottom.
+-- au FileType qf executes this for every file with the filetype "qf" (quickfix).
+vim.cmd([[
+au FileType qf wincmd J
+]])
+
 -- ------------------------------------------------------------------------- }}}
 -- {{{ Folding commands.
+
+Keymap("n", "<leader>zf", "zf%<CR>")
 
 -- Author: Karl Yngve Lervåg
 --    See: https://github.com/lervag/dotnvim
@@ -84,20 +108,20 @@ Keymap("v", "<localleader>E", [["ky :exec "r!" getreg("k")<cr>]])
 -- ------------------------------------------------------------------------- }}}
 -- {{{ TMUX Sessions.
 
-Keymap("n", "<leader>tao",   "<cmd>Dispatch!ao ao<cr>")
+Keymap("n", "<leader>tao", "<cmd>Dispatch!ao ao<cr>")
 Keymap("n", "<leader>tbash", "<cmd>Dispatch!ao bash<cr>")
-Keymap("n", "<leader>tkjv",  "<cmd>Dispatch!ao kjv<cr>")
-Keymap("n", "<leader>tssh",  "<cmd>Dispatch!ao ssh<cr>")
+Keymap("n", "<leader>tkjv", "<cmd>Dispatch!ao kjv<cr>")
+Keymap("n", "<leader>tssh", "<cmd>Dispatch!ao ssh<cr>")
 Keymap("n", "<leader>tsoup", "<cmd>Dispatch!ao soup<cr>")
-Keymap("n", "<leader>tvim",  "<cmd>Dispatch!ao vim<cr>")
+Keymap("n", "<leader>tvim", "<cmd>Dispatch!ao vim<cr>")
 Keymap("n", "<leader>twiki", "<cmd>Dispatch!ao wiki<cr>")
 
-Keymap("n", "<leader>kao",   "<cmd>Dispatch! tmux kill-session -t ao<cr>")
+Keymap("n", "<leader>kao", "<cmd>Dispatch! tmux kill-session -t ao<cr>")
 Keymap("n", "<leader>kbash", "<cmd>Dispatch! tmux kill-session -t bash<cr>")
-Keymap("n", "<leader>kkjv",  "<cmd>Dispatch! tmux kill-session -t kjv<cr>")
-Keymap("n", "<leader>kssh",  "<cmd>Dispatch! tmux kill-session -t ssh<cr>")
+Keymap("n", "<leader>kkjv", "<cmd>Dispatch! tmux kill-session -t kjv<cr>")
+Keymap("n", "<leader>kssh", "<cmd>Dispatch! tmux kill-session -t ssh<cr>")
 Keymap("n", "<leader>ksoup", "<cmd>Dispatch! tmux kill-session -t soup<cr>")
-Keymap("n", "<leader>kvim",  "<cmd>Dispatch! tmux kill-session -t vim<cr>")
+Keymap("n", "<leader>kvim", "<cmd>Dispatch! tmux kill-session -t vim<cr>")
 Keymap("n", "<leader>kwiki", "<cmd>Dispatch! tmux kill-session -t wiki<cr>")
 
 -- ------------------------------------------------------------------------- }}}
@@ -127,6 +151,9 @@ Keymap("n", "<leader>HH", "<cmd>silent vert bo help<cr>")
 -- {{{ L - LSP
 
 -- TODO: Finish implementing LSP keybindings.  Some plugins are not installed.
+
+-- lsp, clangd
+Keymap("n", "<F10>", ":ClangdSwitchSourceHeader<CR>")
 
 -- LSP
 Keymap("n", "<leader>LF", "<cmd>LspToggleAutoFormat<cr>")
@@ -271,7 +298,27 @@ if Is_Enabled("telescope.nvim") then
   Keymap("n", "<leader>fl", "<cmd>Telescope resume<cr>")
   Keymap("n", "<leader>fo", "<cmd>Telescope oldfiles<cr>")
   Keymap("n", "<leader>fp", "<cmd>Telescope planets<cr>")
-  Keymap("n", "<leader>fw", "<cmd>Telescope grep_string<cr>")
+  -- Keymap("n", "<leader>fw", "<cmd>Telescope grep_string<cr>")
+
+  -- vim.keymap.set('n', '<leader>gd', builtin.lsp_definitions, {})
+  Keymap("n", "<leader>gd", "<cmd>Telescope lsp_definitions<cr>")
+
+  -- 查找光标下的词
+  local grep_current_word =
+  [[<cmd>lua require('telescope.builtin').grep_string{ on_complete = { function() vim.cmd"stopinsert" end } }<cr>]]
+  vim.keymap.set('n', '<leader>fw', grep_current_word, { noremap = true, silent = true })
+
+  -- 在当前打开的文件中搜索字符串
+  -- - 上面的命令等同于 :lua require'telescope.builtin'.live_grep{ search_dirs={"%:p"} }
+  local current_file_search = [[<cmd>lua require('telescope.builtin').live_grep{ search_dirs={"%:p"} }<cr>]]
+  vim.keymap.set('n', '<leader>fs', current_file_search, { noremap = true, silent = true })
+
+  local find_symbols = [[<cmd>lua require('telescope.builtin').lsp_document_symbols({symbol_width = 0.8})<cr>]]
+  vim.keymap.set('n', '<F36>', find_symbols, { noremap = true, silent = true }) -- (F36 -> C-F12)
+
+  local find_w_symbols =
+  [[<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols({fname_width = 0.6, symbol_width = 0.2, limit=2000})<cr>]]
+  vim.keymap.set('n', '<F48>', find_w_symbols, { noremap = true, silent = true }) -- (F48 -> C-S-F12)
 end
 
 if Is_Enabled("todo-comments.nvim") then
@@ -352,7 +399,7 @@ end
 if Is_Enabled("neo-tree.nvim") or Is_Enabled("nvim-tree") then
   -- nvim_tree takes precedence when both are true.
   if Is_Enabled("nvim-tree") then
-    Keymap("n", "<c-n>", "<cmd>NvimTreeToggle<cr>")
+    Keymap("n", "<leader>e", "<cmd>NvimTreeToggle<cr>")
     Keymap("n", "<leader>nf", "<cmd>NvimTreeFindFile<cr>")
     Keymap("n", "<leader>nr", "<cmd>NvimTreeRefresh<cr>")
   else
@@ -440,6 +487,7 @@ if Is_Enabled("toggleterm.nvim") then
   Keymap("n", "<leader>Tl", [[<cmd>lua Customize.toggleterm.lazygit()<cr>]])
   Keymap("n", "<leader>Tm", [[<cmd>lua Customize.toggleterm.neomutt()<cr>]])
   Keymap("n", "<leader>Tr", [[<cmd>lua Customize.toggleterm.ranger()<cr>]])
+  Keymap('n', '<leader>ot', ':ToggleTerm<CR>')
 end
 
 -- ------------------------------------------------------------------------- }}}
@@ -470,3 +518,37 @@ Keymap(
 )
 
 -- ------------------------------------------------------------------------- }}}
+
+-- quicklist
+vim.cmd([[
+function! QuickFixOpenAll()
+    if empty(getqflist())
+        return
+    endif
+    let s:prev_val = ""
+    for d in getqflist()
+        let s:curr_val = bufname(d.bufnr)
+        if (s:curr_val != s:prev_val)
+            exec "edit " . s:curr_val
+        endif
+        let s:prev_val = s:curr_val
+    endfor
+endfunction
+]])
+vim.api.nvim_set_keymap('n', '<leader>ka', ':call QuickFixOpenAll()<CR>', { noremap = true, silent = false })
+
+-- 根据不同窗口设置快捷键
+-- F19 -> S-F7
+-- function SET_DIFF_KEYMAP()
+--   vim.keymap.set("n", "<F7>", "]c")  -- jump to next diff
+--   vim.keymap.set("n", "<F19>", "[c") -- jump to prev diff (F19 -> S-F7)
+-- end
+--
+-- function SET_QFIX_KEYMAP()
+-- end
+
+vim.keymap.set("n", "<F7>", ":cn<cr>")
+vim.keymap.set("n", "<F19>", ":cprev<cr>")
+
+Keymap("i", "<C-j>", "copilot#Accept('<CR>')",
+  { noremap = true, expr = true, silent = true, replace_keycodes = false })

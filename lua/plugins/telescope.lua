@@ -14,9 +14,24 @@ return {
     if Use_Defaults(plugin) then
       opts = opts
     else
-      opts. defaults = {
-        layout_config = { prompt_position = "top" },
-        layout_strategy = "horizontal",
+      opts.defaults = {
+        previewer = true,
+        file_previewer = require 'telescope.previewers'.vim_buffer_cat.new,
+        grep_previewer = require 'telescope.previewers'.vim_buffer_vimgrep.new,
+        qflist_previewer = require 'telescope.previewers'.vim_buffer_qflist.new,
+        layout_strategy = 'vertical',
+        layout_config = {
+          width = 0.9,
+          height = 0.9,
+        },
+        mappings = {
+          n = {
+            ['<C-d>'] = require('telescope.actions').delete_buffer,
+          }
+        },                   -- mappings
+        initial_mode = 'insert', -- insert/normal
+        -- layout_config = { prompt_position = "top" },
+        -- layout_strategy = "horizontal",
         prompt_prefix = " ",
         selection_caret = " ",
         sorting_strategy = "ascending",
