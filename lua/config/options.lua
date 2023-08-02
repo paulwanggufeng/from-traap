@@ -82,7 +82,7 @@ vim.cmd([[filetype plugin indent on]])
 
 
 -- 外观
-vim.cmd [[colorscheme tokyonight-moon]]
+-- vim.cmd [[colorscheme tokyonight-moon]]
 
 -- 文件编码
 vim.scriptencoding = "utf-8"

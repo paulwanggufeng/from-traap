@@ -5,7 +5,7 @@ Use_Defaults = require("config.functions").use_plugin_defaults
 local plugin = "nvim-tree"
 
 return {
-  "kyazdani42/" .. plugin,
+  "nvim-tree/" .. plugin .. ".lua",
   enabled = Is_Enabled(plugin),
   cmd = { "NvimTreeFindFile", "NvimTreeRefresh", "NvimTreeToggle", },
   opts = function(_, opts)

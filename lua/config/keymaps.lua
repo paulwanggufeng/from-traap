@@ -34,7 +34,11 @@ Keymap("n", "Vaa", "ggVG")
 Keymap("n", "<leader>V", "V`]")
 
 -- Save all files.
-Keymap({ "n", "i", "v", "x" }, "<C-s>", "<cmd>wall<cr>")
+-- Keymap({ "n", "i", "v", "x" }, "<C-s>", "<cmd>wall<cr>")
+Keymap( "n", "<C-s>", "<cmd>wall<cr>")
+Keymap( "i", "<C-s>", "<cmd>wall<cr>")
+Keymap(  "v", "<C-s>", "<cmd>wall<cr>")
+Keymap(  "x" , "<C-s>", "<cmd>wall<cr>")
 
 -- Delete to end of word
 Keymap("n", "<C-Del>", "de")

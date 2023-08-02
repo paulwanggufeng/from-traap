@@ -30,7 +30,6 @@ Customize = {
     ["indent-blankline"] = { enabled = true, defaults = false },
     ["leap.nvim"] = { enabled = true }, -- xxxxxxxxxxxxxxxxx
     ["markdown-preview.nvim"] = { enabled = true },
-    ["neo-tree.nvim"] = { enabled = true, defaults = false },
     ["neoconf.nvim"] = { enabled = false },
     ["neodev.nvim"] = { enabled = true },
     ["neoformat"] = { enabled = false },
@@ -38,6 +37,9 @@ Customize = {
     ["nui.nvim"] = { enabled = true },
     ["nvim-base16"] = { enabled = false },
     ["nvim-colorizer.lua"] = { enabled = true },
+
+    ["neo-tree.nvim"] = { enabled = false, defaults = false },
+    ["nvim-tree"] = { enabled = true },
 
     -- auto complete
     ["LuaSnip"] = { enabled = true },
@@ -76,7 +78,6 @@ Customize = {
     ["todo-comments.nvim"] = { enabled = true },
     ["vim-visual-increment"] = { enabled = true },
 
-    ["nvim-tree"] = { enabled = false },
     ["lualine.nvim"] = { enabled = true, defaults = false },
 
     ["plenary.nvim"] = { enabled = true },
